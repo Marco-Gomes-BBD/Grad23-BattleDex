@@ -1,0 +1,40 @@
+Components:
+  Idea generator
+  Slide generator
+  Slide coalescing (making the deck)
+
+
+Considerations:
+  Should the decks be shuffled or ordered?
+  Keywords should be configurable
+  Should we allow circular references?
+  How many slides?
+  How much time per slide?
+  How long should the presentation be? 05:00.
+
+
+Database
+  slideshow
+    topic : string
+    imageSequenceId: id
+
+  imageSequence:
+    imageSequenceId
+    sequence
+    image
+  
+  images:
+    id
+    path
+  
+  imageTags
+    imageId
+    tag
+
+
+
+Squirrel with gun
+squirrel, gun
+squirrel (animal), gun (weapon)
+
+L-system random
