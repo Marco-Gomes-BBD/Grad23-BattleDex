@@ -1,17 +1,24 @@
 Components:
-  Idea generator
-  Slide generator
-  Slide coalescing (making the deck)
-
+  Base Project                  Marco
+    L-System                    Marius
+    Topic Parser                Marco
+    Database (+Connection)      Jordan
+    Slide generator             Daniel, Johan
+    Making the deck (Excel)     Benedict
+    Frontend                    Dane, Johan
 
 Considerations:
-  Should the decks be shuffled or ordered?
-  Keywords should be configurable
-  Should we allow circular references?
-  How many slides?
-  How much time per slide?
-  How long should the presentation be? 05:00.
+  Unit testing?
 
+  L-System:
+    Keywords should be configurable
+    Should we allow circular references?
+
+  Slide parameters:
+    How many slides? slideCount
+    How much time per slide? slideDuration
+    How long should the presentation be? 05:00. slideshowDuration = slideCount * slideDuration
+    Should the decks be shuffled or ordered? Probably not.
 
 Database
   slideshow
@@ -22,16 +29,20 @@ Database
     imageSequenceId
     sequence
     image
-  
+
   images:
     id
     path
-  
+
   imageTags
     imageId
     tag
 
+  What are the available tags?
+  Do you have this tag?
 
+
+Excel = Powerpoint
 
 Squirrel with gun
 squirrel, gun
