@@ -1,6 +1,6 @@
-namespace Grad23_BattleDex.src.TopicsGenerator.Shared
+namespace Grad23_BattleDex.Topics
 {
-  public class LSystem
+    public class LSystem
   {
     private Dictionary<char, string[]> rules;
     private string axiom;
@@ -44,4 +44,5 @@ namespace Grad23_BattleDex.src.TopicsGenerator.Shared
       return current;
     }
   }
+
 }

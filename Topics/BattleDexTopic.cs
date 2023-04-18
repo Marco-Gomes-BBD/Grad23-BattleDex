@@ -1,8 +1,6 @@
-using Grad23_BattleDex.src.TopicsGenerator.Shared;
-
-namespace Grad23_BattleDex.src.TopicsGenerator
+namespace Grad23_BattleDex.Topics
 {
-  class BattleDexTopic
+    class BattleDexTopic
   {
     private LSystem lSystem;
 
