@@ -1,6 +1,6 @@
 namespace Grad23_BattleDex.Topics
 {
-    class BattleDexTopic
+  class BattleDexTopic
   {
     private LSystem lSystem;
 
