@@ -11,16 +11,17 @@ namespace Grad23_BattleDex.Topics
       this.lSystem = new LSystem(axiom, rules);
     }
 
-    public BattleDexTopic(string axiom, Dictionary<char, string[]> rules)
+    public BattleDexTopic(string filePath)
     {
+      RulesLoader rulesLoader = new RulesLoader(filePath);
+      Dictionary<char, string[]> rules = rulesLoader.LoadRuleSet();
+      string axiom = rulesLoader.GetAxiom();
       this.lSystem = new LSystem(axiom, rules);
     }
 
-    public BattleDexTopic(int randomSeed)
+    public BattleDexTopic(string axiom, Dictionary<char, string[]> rules)
     {
-      string axiom = "S";
-      Dictionary<char, string[]> rules = CreateRules();
-      this.lSystem = new LSystem(axiom, rules, randomSeed);
+      this.lSystem = new LSystem(axiom, rules);
     }
 
     public BattleDexTopic(string axiom, Dictionary<char, string[]> rules, int randomSeed)
@@ -35,11 +36,11 @@ namespace Grad23_BattleDex.Topics
       
       rules['S'] = new string[] { "N P V B P F T" };
       rules['N'] = GetNouns();
-      rules['P'] = GetPrepositions(); // Prepositions
-      rules['V'] = GetVerbs(); // Verbs
-      rules['F'] = GetVerbsTwo(); // Verbs 2
-      rules['T'] = GetTopicTail(); // Phrases
-      rules['B'] = GetTopicBody(); // Topic Body
+      rules['P'] = GetPrepositions();
+      rules['V'] = GetVerbs();
+      rules['F'] = GetVerbsTwo();
+      rules['T'] = GetTopicTail();
+      rules['B'] = GetTopicBody();
 
       return rules;
     }
