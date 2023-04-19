@@ -2,4 +2,9 @@
 obj/
 bin/
 
+# IDE
+.idea/
+.vs/
+.vscode/
+
 *.user
