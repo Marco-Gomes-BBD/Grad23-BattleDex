@@ -24,6 +24,13 @@ public partial class BattleDex : Form
         insertImages(imageJson);
     }
 
+    private SqlConnection ConnectToDB()
+    {
+        String connectionString = @"Data Source=.\SQLEXPRESS; Initial Catalog=BattleDexDB; Integrated Security=True";
+        SqlConnection conn = new SqlConnection(connectionString);
+        return conn;
+    }
+
 
     public class Image
     {
