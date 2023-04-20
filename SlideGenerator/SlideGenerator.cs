@@ -15,7 +15,7 @@ namespace Grad23_BattleDex.SG
                 .Where(dbTag => Contains(dbTag, tags)).ToList();
 
 
-            return databaseFunctions.GetImagesForTags(dbTags)
+            return databaseFunctions.GetImagesForTag(dbTags)
                 .OrderBy(a => random.Next())
                 .Take(presentationSize)
                 .ToList();
