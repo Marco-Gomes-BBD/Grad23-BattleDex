@@ -11,7 +11,7 @@ namespace Grad23_BattleDex.SG
 
         private static Random random = new Random();
 
-        public List<string> Generate(List<string> tags, int presentationSize, SqlConnection connection)
+        public static List<string> Generate(List<string> tags, int presentationSize, SqlConnection connection)
         {
             List<string> locations = GetImageLocations(tags, connection)
                 .OrderBy(a => random.Next())
@@ -20,7 +20,7 @@ namespace Grad23_BattleDex.SG
             return locations;
         }
 
-        private List<string> GetImageLocations(List<string> tags, SqlConnection connection)
+        private static List<string> GetImageLocations(List<string> tags, SqlConnection connection)
         {
             List<string> locations = new List<string>();
             string query = "SELECT DISTINC(IMAGES.file_path)" +
