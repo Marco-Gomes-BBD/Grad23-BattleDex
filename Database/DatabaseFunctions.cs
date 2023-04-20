@@ -80,11 +80,16 @@ namespace Grad23_BattleDex.Database
             return tags;
         }
 
-        public List<String> GetImagesForTag(String tag)
+        public List<String> GetImagesForTag(String tag, int number = 0)
         {
             SqlConnection conn = ConnectToDB();
             conn.Open();
-            String sql = "SELECT file_path FROM images " +
+            String sql = "SELECT";
+            if (number > 0)
+            {
+                sql += " TOP " + number;
+            }
+            sql += " file_path FROM images " +
                             "LEFT JOIN images_tags ON images.id = images_tags.image_id " +
                             "LEFT JOIN tags ON images_tags.tag_id = tags.id " +
                             "WHERE tags.tag = @tag";
