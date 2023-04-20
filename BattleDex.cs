@@ -43,13 +43,13 @@ public partial class BattleDex : Form
         SqlConnection conn = ConnectToDB();
         conn.Open();
         List<Image> imageLines = JsonSerializer.Deserialize<List<Image>>(imagesJson);
-        String imageInsert = "INSERT INTO dbo.images (file_path) SELECT @filepath " + 
-                             "WHERE NOT EXISTS (SELECT * FROM dbo.images WHERE file_path = @filepath); " + 
+        String imageInsert = "INSERT INTO dbo.images (file_path) SELECT @filepath " +
+                             "WHERE NOT EXISTS (SELECT * FROM dbo.images WHERE file_path = @filepath); " +
                              "SELECT id FROM dbo.images WHERE file_path = @filepath";
-        String tagInsert = "INSERT INTO dbo.tags (tag) SELECT @tag " + 
+        String tagInsert = "INSERT INTO dbo.tags (tag) SELECT @tag " +
                             "WHERE NOT EXISTS (SELECT * FROM dbo.tags WHERE tag = @tag); " +
                             "SELECT id FROM dbo.tags WHERE tag = @tag";
-        String imagetagInsert = "INSERT INTO dbo.images_tags (image_id, tag_id) SELECT @image_id, @tag_id " + 
+        String imagetagInsert = "INSERT INTO dbo.images_tags (image_id, tag_id) SELECT @image_id, @tag_id " +
                                 "WHERE NOT EXISTS (SELECT * FROM dbo.images_tags WHERE image_id = @image_id AND tag_id = @tag_id)";
         foreach (var item in imageLines)
         {
@@ -77,5 +77,25 @@ public partial class BattleDex : Form
             }
         }
         conn.Close();
+    }
+
+    private List<String> AllExistingTags()
+    {
+        SqlConnection conn = ConnectToDB();
+        conn.Open();
+        String sql = "SELECT tag FROM dbo.tags";
+        List<String> tags = new List<String>();
+        using (SqlCommand command = new SqlCommand(sql, conn))
+        {
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    tags.Add(reader.GetString(0));
+                }
+            }
+        }
+        conn.Close();
+        return tags;
     }
 }
