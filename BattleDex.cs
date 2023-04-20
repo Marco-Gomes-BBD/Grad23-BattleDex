@@ -21,7 +21,13 @@ public partial class BattleDex : Form
                     ""tags"": [""nose"", ""ears"", ""tail""]
                 }
             ]";
-        insertImages(imageJson);
+        //insertImages(imageJson);
+        // List<String> tags = AllExistingTags();
+        List<String> images = GetImagesForTag("nose");
+        foreach (var image in images)
+        {
+            Console.WriteLine(image);
+        }
     }
 
     private SqlConnection ConnectToDB()
@@ -97,5 +103,27 @@ public partial class BattleDex : Form
         }
         conn.Close();
         return tags;
+    }
+
+    private List<String> GetImagesForTag(String tag)
+    {
+        SqlConnection conn = ConnectToDB();
+        conn.Open();
+        String sql = "SELECT file_path FROM images " +
+                        "LEFT JOIN images_tags ON images.id = images_tags.image_id " +
+                        "LEFT JOIN tags ON images_tags.tag_id = tags.id " +
+                        "WHERE tags.tag = @tag";
+        List<String> images = new List<String>();
+        using (SqlCommand command = new SqlCommand(sql, conn))
+        {
+            command.Parameters.AddWithValue("@tag", tag);
+            SqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                images.Add(reader.GetString(0));
+            }
+        }
+        conn.Close();
+        return images;
     }
 }
