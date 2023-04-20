@@ -11,10 +11,19 @@ namespace Grad23_BattleDex.SG
         public static List<string> Generate(List<string> tags, int presentationSize)
         {
             DatabaseFunctions databaseFunctions = new DatabaseFunctions();
-            return databaseFunctions.GetImagesForTags(tags)
+            List<string> dbTags = databaseFunctions.AllExistingTags()
+                .Where(dbTag => Contains(dbTag, tags)).ToList();
+
+
+            return databaseFunctions.GetImagesForTags(dbTags)
                 .OrderBy(a => random.Next())
                 .Take(presentationSize)
                 .ToList();
+        }
+
+        private static Boolean Contains(string dbTag, List<String> tags)
+        {
+            return tags.Select(tag => tag.Contains(dbTag)).Any();
         }
 
     }
