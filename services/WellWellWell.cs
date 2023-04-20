@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Office2010.Drawing;
+using DocumentFormat.OpenXml.Office2016.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
 using BlipFill = DocumentFormat.OpenXml.Presentation.BlipFill;
@@ -17,6 +18,7 @@ using Shape = DocumentFormat.OpenXml.Presentation.Shape;
 using ShapeProperties = DocumentFormat.OpenXml.Presentation.ShapeProperties;
 using TextBody = DocumentFormat.OpenXml.Presentation.TextBody;
 using Transform2D = DocumentFormat.OpenXml.Drawing.Transform2D;
+using GroupShapeProperties = DocumentFormat.OpenXml.Presentation.GroupShapeProperties;
 
 namespace Grad23_BattleDex.services;
 
@@ -80,16 +82,10 @@ public class WellWellWell
                             new NonVisualDrawingProperties { Id = (UInt32Value)2U, Name = "Title 1" },
                             new NonVisualShapeDrawingProperties(new ShapeLocks { NoGrouping = true }),
                             new ApplicationNonVisualDrawingProperties(new PlaceholderShape())),
-                        new ShapeProperties(),
-                        new TextBody(
-                            new BodyProperties(),
-                            new ListStyle(),
-                            new Paragraph(new EndParagraphRunProperties { Language = "en-US" }))))),
+                        new ShapeProperties()))),
             new ColorMapOverride(new MasterColorMapping()));
         return slidePart1;
     }
-
-    // TODO:  Check if master slide layout can be duplicated
 
     private static SlideLayoutPart CreateSlideLayoutPart(SlidePart slidePart1)
     {
@@ -112,33 +108,10 @@ public class WellWellWell
             new ColorMapOverride(new MasterColorMapping())
         );
 
-        // var slideLayoutPart1 = slidePart1.AddNewPart<SlideLayoutPart>("rId1");
-        //     var slideLayout = new SlideLayout(
-        //         new CommonSlideData(new ShapeTree(
-        //             new NonVisualGroupShapeProperties(
-        //                 new NonVisualDrawingProperties { Id = (UInt32Value)1U, Name = "" },
-        //                 new NonVisualGroupShapeDrawingProperties(),
-        //                 new ApplicationNonVisualDrawingProperties()),
-        //             new GroupShapeProperties(new TransformGroup()),
-        //             new Shape(
-        //                 new NonVisualShapeProperties(
-        //                     new NonVisualDrawingProperties { Id = (UInt32Value)2U, Name = "" },
-        //                     new NonVisualShapeDrawingProperties(new ShapeLocks { NoGrouping = true }),
-        //                     new ApplicationNonVisualDrawingProperties(new PlaceholderShape())),
-        //                 new ShapeProperties(),
-        //                 new TextBody(
-        //                     new BodyProperties(),
-        //                     new ListStyle(),
-        //                     new Paragraph(new EndParagraphRunProperties()))))),
-        //         new ColorMapOverride(new MasterColorMapping()));
-        //     slideLayoutPart1.SlideLayout = slideLayout;
-        //     return slideLayoutPart1;
-
         layoutPart.SlideLayout = slideLayout;
         return layoutPart;
     }
 
-    // TODO: Copy to child slides
     private static SlideMasterPart CreateSlideMasterPart(SlideLayoutPart slideLayoutPart1)
     {
         var slideMasterPart1 = slideLayoutPart1.AddNewPart<SlideMasterPart>("rId1");
@@ -384,14 +357,8 @@ public class WellWellWell
         var blipExtensionList1 = new BlipExtensionList();
         var blipExtension1 = new BlipExtension
         {
-            Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}"
+            Uri = $"{{{Guid.NewGuid().ToString()}}}"
         };
-        var useLocalDpi1 = new UseLocalDpi
-        {
-            Val = false
-        };
-        useLocalDpi1.AddNamespaceDeclaration("a14", "http://schemas.microsoft.com/office/drawing/2010/main");
-        blipExtension1.Append(useLocalDpi1);
         blipExtensionList1.Append(blipExtension1);
         blip1.Append(blipExtensionList1);
         var stretch = new Stretch();
@@ -411,18 +378,6 @@ public class WellWellWell
             Cx = 9143990,
             Cy = 6857990
         });
-
-        // // TODO:  Check Interop package for this functionality
-        // picture.ShapeProperties.Transform2Append(new Offset
-        // {
-        //     X = 0,
-        //     Y = 0
-        // });
-        // picture.ShapeProperties.Transform2Append(new Extents
-        // {
-        //     Cx = 1000000,
-        //     Cy = 1000000
-        // });
         picture.ShapeProperties.Append(new PresetGeometry
         {
             Preset = ShapeTypeValues.Rectangle
@@ -436,53 +391,23 @@ public class WellWellWell
         Slide slide = new Slide(new CommonSlideData(new ShapeTree()));
         SlidePart slidePart = presentationPart.AddNewPart<SlidePart>();
 
-        // TODO:  Evaluate image container in doc
         slide.Save(slidePart);
         SlideMasterPart smPart = presentationPart.SlideMasterParts.First();
         SlideLayoutPart slPart = smPart.SlideLayoutParts.First();
 
-        //Add the layout part to the new slide from the slide master
         slidePart.AddPart<SlideLayoutPart>(slPart);
         slidePart.Slide.CommonSlideData = (CommonSlideData)slPart.SlideLayout.CommonSlideData.Clone();
 
-        // TODO:  Check image creation on doc
-
         AddImage(slidePart, imagePath, ImageTypes.Png);
 
-        // TODO:  Check if we can get data without sourcing from master slide
-        // using (Stream stream = slPart.GetStream())
-        // {
-        //     slidePart.SlideLayoutPart.FeedData(stream);
-        // }
-
-        //UPDATED: Copy the images from the slide master layout to the new slide
-        // foreach (ImagePart iPart in slPart.AddImagePart())
-        // {
-        //     ImagePart newImagePart = slidePart.AddImagePart(iPart.ContentType, slPart.GetIdOfPart(iPart));
-        //     newImagePart.FeedData(iPart.GetStream());
-        // }
-
         presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
-        // SlideId newSlideId = presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
-
-        // TODO: Check default value in presentation ID list,  or try append to static value maybe?
-        // newSlideId = slideId;
-        // newSlideIRelationshipId = pPart.GetIdOfPart(sPart);
     }
 
-    // TODO: check if we can bypass slide layout generation through pML Ids
     private static void BuildSlides(PresentationPart pPart, List<string> imagePaths)
     {
-        // TODO:  Check need for slideIdList with only slide master
-        // pPart.Presentation.SlideIdList = new SlideIdList();
-
-        // TODO: complete declaration of image fills to slides,  verify slide layout parts
         for (int i = 0; i < imagePaths.Count; i++)
         {
             InsertSlide(pPart, imagePaths[i]);
         }
-
-        // TODO:  Check if we still need
-        pPart.Presentation.Save();
     }
 }
