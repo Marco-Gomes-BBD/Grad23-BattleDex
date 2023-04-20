@@ -80,31 +80,38 @@ namespace Grad23_BattleDex.Database
             return tags;
         }
 
-        public List<String> GetImagesForTag(String tag, int number = 0)
+        public List<String> GetImagesForTag(List<String> tags, int number = 0)
         {
             SqlConnection conn = ConnectToDB();
             conn.Open();
-            String sql = "SELECT";
+            String sql = "SELECT ";
             if (number > 0)
             {
-                sql += " TOP " + number;
+                sql += "TOP " + number;
             }
-            sql += " file_path FROM images " +
+            sql += "file_path FROM images " +
                             "LEFT JOIN images_tags ON images.id = images_tags.image_id " +
                             "LEFT JOIN tags ON images_tags.tag_id = tags.id " +
                             "WHERE tags.tag = @tag";
             List<String> images = new List<String>();
-            using (SqlCommand command = new SqlCommand(sql, conn))
+            foreach (String tag in tags)
             {
-                command.Parameters.AddWithValue("@tag", tag);
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
+                using (SqlCommand command = new SqlCommand(sql, conn))
                 {
-                    images.Add(reader.GetString(0));
+                    command.Parameters.AddWithValue("@tag", tag);
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        if (images.Count < number || number == 0)
+                        {
+                            images.Add(reader.GetString(0));                            
+                        }
+                    }
+                    reader.Close();
                 }
             }
             conn.Close();
-            return images;
+            return images.Distinct().ToList();
         }
     }
 }
