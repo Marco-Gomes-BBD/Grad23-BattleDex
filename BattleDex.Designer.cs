@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1
+﻿namespace Grad23_BattleDex
 {
     partial class frmBattle
     {
