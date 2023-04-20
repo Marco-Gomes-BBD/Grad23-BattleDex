@@ -2,8 +2,10 @@
 obj/
 bin/
 
-# Visual studio
+# IDE
+.idea/
 .vs/
+.vscode/
 
 # User files
 *.user
