@@ -13,12 +13,25 @@ namespace Grad23_BattleDex.SG
             DatabaseFunctions databaseFunctions = new();
             List<string> dbTags = databaseFunctions.AllExistingTags()
                 .Where(dbTag => Contains(dbTag, tags)).ToList();
-            List<String> hold = databaseFunctions.GetImagesForTag(dbTags);
 
-            return databaseFunctions.GetImagesForTag(dbTags)
+            List<string> locations = databaseFunctions.GetImagesForTag(dbTags)
                 .OrderBy(a => random.Next())
                 .Take(presentationSize)
                 .ToList();
+
+            int remaining = presentationSize - locations.Count();
+
+            if (remaining > 0) 
+            {
+                locations.AddRange(
+                    databaseFunctions.GetAllImages()
+                    .Where(location => !locations.Contains(location))
+                    .OrderBy(a => random.Next())
+                    .Take(remaining)
+                    .ToList());
+            }
+
+            return locations;
         }
 
         private static Boolean Contains(string dbTag, List<String> tags)
