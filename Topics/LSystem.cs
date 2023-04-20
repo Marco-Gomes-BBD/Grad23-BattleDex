@@ -2,9 +2,9 @@ namespace Grad23_BattleDex.Topics
 {
   public class LSystem
   {
-    private Dictionary<char, string[]> rules;
-    private string axiom;
-    private Random random;
+    private readonly Dictionary<char, string[]> rules;
+    private readonly string axiom;
+    private readonly Random random;
 
     public LSystem(string axiom, Dictionary<char, string[]> rules)
     {

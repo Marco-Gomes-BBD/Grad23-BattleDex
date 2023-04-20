@@ -1,21 +1,13 @@
 ﻿using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
 using BlipFill = DocumentFormat.OpenXml.Presentation.BlipFill;
-using ColorMap = DocumentFormat.OpenXml.Presentation.ColorMap;
 using NonVisualDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualDrawingProperties;
-using NonVisualGroupShapeDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualGroupShapeDrawingProperties;
-using NonVisualGroupShapeProperties = DocumentFormat.OpenXml.Presentation.NonVisualGroupShapeProperties;
 using NonVisualPictureDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureDrawingProperties;
 using NonVisualPictureProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureProperties;
-using NonVisualShapeDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualShapeDrawingProperties;
-using NonVisualShapeProperties = DocumentFormat.OpenXml.Presentation.NonVisualShapeProperties;
 using Picture = DocumentFormat.OpenXml.Presentation.Picture;
-using Shape = DocumentFormat.OpenXml.Presentation.Shape;
 using ShapeProperties = DocumentFormat.OpenXml.Presentation.ShapeProperties;
-using TextBody = DocumentFormat.OpenXml.Presentation.TextBody;
 using DShape = DocumentFormat.OpenXml.Drawing.Shape;
 
 namespace Grad23_BattleDex.services;
@@ -27,11 +19,9 @@ public class DeckGenerator
     {
         File.Copy(templateFile, resultFilePath, true);
 
-        using (PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true))
-        {
-            BuildSlides(presentation.PresentationPart, imagePaths);
-            AddTopic(presentation.PresentationPart, topic);
-        }
+        PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true);
+        BuildSlides(presentation.PresentationPart, imagePaths);
+        AddTopic(presentation.PresentationPart, topic);
     }
 
     private static void AddTopic(PresentationPart presentationPart, string topic)

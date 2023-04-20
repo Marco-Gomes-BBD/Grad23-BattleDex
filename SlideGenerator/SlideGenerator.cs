@@ -3,28 +3,27 @@ using System.Data;
 
 namespace Grad23_BattleDex.SG
 {
-
     public class SlideGenerator
     {
-        private static Random random = new();
+        private static readonly Random random = new();
 
         public static List<string> Generate(List<string> tags, int presentationSize)
         {
             DatabaseFunctions databaseFunctions = new();
-            List<string> dbTags = databaseFunctions.AllExistingTags()
+            List<string> dbTags = DatabaseFunctions.AllExistingTags()
                 .Where(dbTag => Contains(dbTag, tags)).ToList();
 
-            List<string> locations = databaseFunctions.GetImagesForTag(dbTags)
+            List<string> locations = DatabaseFunctions.GetImagesForTag(dbTags)
                 .OrderBy(a => random.Next())
                 .Take(presentationSize)
                 .ToList();
 
-            int remaining = presentationSize - locations.Count();
+            int remaining = presentationSize - locations.Count;
 
-            if (remaining > 0) 
+            if (remaining > 0)
             {
                 locations.AddRange(
-                    databaseFunctions.GetAllImages()
+                    DatabaseFunctions.GetAllImages()
                     .Where(location => !locations.Contains(location))
                     .OrderBy(a => random.Next())
                     .Take(remaining)
@@ -34,11 +33,9 @@ namespace Grad23_BattleDex.SG
             return locations;
         }
 
-        private static Boolean Contains(string dbTag, List<String> tags)
+        private static bool Contains(string dbTag, List<string> tags)
         {
             return tags.Select(dbTag.Contains).Any();
         }
-
     }
-
 }

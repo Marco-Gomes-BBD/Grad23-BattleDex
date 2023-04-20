@@ -8,7 +8,7 @@ namespace Grad23_BattleDex.Topics
     {
       string axiom = "S";
       Dictionary<char, string[]> rules = CreateRules();
-      this.lSystem = new LSystem(axiom, rules);
+      lSystem = new LSystem(axiom, rules);
     }
 
     public BattleDexTopic(string filePath)
@@ -16,17 +16,17 @@ namespace Grad23_BattleDex.Topics
       RulesLoader rulesLoader = new RulesLoader(filePath);
       Dictionary<char, string[]> rules = rulesLoader.LoadRuleSet();
       string axiom = rulesLoader.GetAxiom();
-      this.lSystem = new LSystem(axiom, rules);
+      lSystem = new LSystem(axiom, rules);
     }
 
     public BattleDexTopic(string axiom, Dictionary<char, string[]> rules)
     {
-      this.lSystem = new LSystem(axiom, rules);
+      lSystem = new LSystem(axiom, rules);
     }
 
     public BattleDexTopic(string axiom, Dictionary<char, string[]> rules, int randomSeed)
     {
-      this.lSystem = new LSystem(axiom, rules, randomSeed);
+      lSystem = new LSystem(axiom, rules, randomSeed);
     }
     
 
