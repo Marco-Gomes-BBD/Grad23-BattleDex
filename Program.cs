@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Grad23_BattleDex.services;
 
 namespace Grad23_BattleDex;
@@ -14,7 +16,8 @@ static class Program
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
 
-        string filePath = @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\result.pptx";
+        string resultFilePath = @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\result.pptx";
+        string templateFilePath = @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\template\template.pptx";
         List<string> imagePaths = new List<string>
         {
             @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\unfinished.png",
@@ -22,10 +25,8 @@ static class Program
             @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\java.png",
             @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\bad.png"
         };
-
-        WellWellWell.CreatePresentation(filePath, imagePaths);
-        // PresentationGenerator.CreatePresentation(new List<string> { "C:\\Users\\dubeb003\\projects\\grad\\cs-lvlup\\battle-dex\\images\\MicrosoftTeams-image(1).png" });
+        DeckGenerator.CreatePresentation(templateFilePath, resultFilePath, "Temporary topic", imagePaths);
 
         // Application.Run(new BattleDex());
-    }    
+    }
 }
