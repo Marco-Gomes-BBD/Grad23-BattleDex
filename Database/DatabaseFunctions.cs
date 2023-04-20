@@ -80,6 +80,26 @@ namespace Grad23_BattleDex.Database
             return tags;
         }
 
+        public List<string> GetAllImages()
+        {
+            SqlConnection conn = ConnectToDB();
+            conn.Open();
+            String sql = "SELECT file_path FROM dbo.images";
+            List<String> tags = new List<String>();
+            using (SqlCommand command = new SqlCommand(sql, conn))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            conn.Close();
+            return tags;
+        }
+
         public List<String> GetImagesForTag(List<String> tags, int number = 0)
         {
             SqlConnection conn = ConnectToDB();
