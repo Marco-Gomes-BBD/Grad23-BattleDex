@@ -38,8 +38,6 @@ public class WellWellWell
         var slideMasterIdList1 = new SlideMasterIdList(new SlideMasterId
             { Id = (UInt32Value)2147483648U, RelationshipId = "rId1" });
 
-        // imagePaths.ForEach();
-
         var slideIdList1 = new SlideIdList(new SlideId { Id = (UInt32Value)256U, RelationshipId = "rId2" });
         var slideSize1 = new SlideSize { Cx = 9144000, Cy = 6858000, Type = SlideSizeValues.Screen4x3 };
         var notesSize1 = new NotesSize { Cx = 6858000, Cy = 9144000 };
@@ -62,6 +60,8 @@ public class WellWellWell
         slideMasterPart1.AddPart(slideLayoutPart1, "rId1");
         presentationPart.AddPart(slideMasterPart1, "rId1");
         presentationPart.AddPart(themePart1, "rId5");
+
+        BuildSlides(presentationPart, imagePaths);
     }
 
     private static SlidePart CreateSlidePart(PresentationPart presentationPart)
@@ -90,10 +90,11 @@ public class WellWellWell
     }
 
     // TODO:  Check if master slide layout can be duplicated
+
     private static SlideLayoutPart CreateSlideLayoutPart(SlidePart slidePart1)
     {
-        var slideLayoutPart1 = slidePart1.AddNewPart<SlideLayoutPart>("rId1");
-        var slideLayout = new SlideLayout(
+        SlideLayoutPart layoutPart = slidePart1.AddNewPart<SlideLayoutPart>("rId1");
+        SlideLayout slideLayout = new SlideLayout(
             new CommonSlideData(new ShapeTree(
                 new NonVisualGroupShapeProperties(
                     new NonVisualDrawingProperties { Id = (UInt32Value)1U, Name = "" },
@@ -105,14 +106,36 @@ public class WellWellWell
                         new NonVisualDrawingProperties { Id = (UInt32Value)2U, Name = "" },
                         new NonVisualShapeDrawingProperties(new ShapeLocks { NoGrouping = true }),
                         new ApplicationNonVisualDrawingProperties(new PlaceholderShape())),
-                    new ShapeProperties(),
-                    new TextBody(
-                        new BodyProperties(),
-                        new ListStyle(),
-                        new Paragraph(new EndParagraphRunProperties()))))),
-            new ColorMapOverride(new MasterColorMapping()));
-        slideLayoutPart1.SlideLayout = slideLayout;
-        return slideLayoutPart1;
+                    new ShapeProperties()
+                    // new DocumentFormat.OpenXml.Drawing.Pictures.Picture(oiefhwufh)
+            ))),
+            new ColorMapOverride(new MasterColorMapping())
+        );
+
+        // var slideLayoutPart1 = slidePart1.AddNewPart<SlideLayoutPart>("rId1");
+        //     var slideLayout = new SlideLayout(
+        //         new CommonSlideData(new ShapeTree(
+        //             new NonVisualGroupShapeProperties(
+        //                 new NonVisualDrawingProperties { Id = (UInt32Value)1U, Name = "" },
+        //                 new NonVisualGroupShapeDrawingProperties(),
+        //                 new ApplicationNonVisualDrawingProperties()),
+        //             new GroupShapeProperties(new TransformGroup()),
+        //             new Shape(
+        //                 new NonVisualShapeProperties(
+        //                     new NonVisualDrawingProperties { Id = (UInt32Value)2U, Name = "" },
+        //                     new NonVisualShapeDrawingProperties(new ShapeLocks { NoGrouping = true }),
+        //                     new ApplicationNonVisualDrawingProperties(new PlaceholderShape())),
+        //                 new ShapeProperties(),
+        //                 new TextBody(
+        //                     new BodyProperties(),
+        //                     new ListStyle(),
+        //                     new Paragraph(new EndParagraphRunProperties()))))),
+        //         new ColorMapOverride(new MasterColorMapping()));
+        //     slideLayoutPart1.SlideLayout = slideLayout;
+        //     return slideLayoutPart1;
+
+        layoutPart.SlideLayout = slideLayout;
+        return layoutPart;
     }
 
     // TODO: Copy to child slides
@@ -380,12 +403,13 @@ public class WellWellWell
         picture.ShapeProperties = new ShapeProperties();
         picture.ShapeProperties.Transform2D = new Transform2D(new Offset
         {
-            X = 0,
-            Y = 0
+            // TODO:  Check padding size on actual image
+            X = 5,
+            Y = 5
         }, new Extents
         {
-            Cx = 1000000,
-            Cy = 1000000
+            Cx = 9143990,
+            Cy = 6857990
         });
 
         // // TODO:  Check Interop package for this functionality
@@ -407,33 +431,39 @@ public class WellWellWell
         tree.Append(picture);
     }
 
-    private static void InsertSlide(PresentationPart pPart, string layoutName, UInt32 slideId)
+    private static void InsertSlide(PresentationPart presentationPart, string imagePath)
     {
         Slide slide = new Slide(new CommonSlideData(new ShapeTree()));
-        SlidePart sPart = pPart.AddNewPart<SlidePart>();
-        slide.Save(sPart);
-        SlideMasterPart smPart = pPart.SlideMasterParts.First();
-        SlideLayoutPart slPart =
-            smPart.SlideLayoutParts.Single(part => part.SlideLayout.CommonSlideData.Name == layoutName);
+        SlidePart slidePart = presentationPart.AddNewPart<SlidePart>();
+
+        // TODO:  Evaluate image container in doc
+        slide.Save(slidePart);
+        SlideMasterPart smPart = presentationPart.SlideMasterParts.First();
+        SlideLayoutPart slPart = smPart.SlideLayoutParts.First();
 
         //Add the layout part to the new slide from the slide master
-        sPart.AddPart<SlideLayoutPart>(slPart);
-        sPart.Slide.CommonSlideData = (CommonSlideData)smPart.SlideLayoutParts
-            .Single(part => part.SlideLayout.CommonSlideData.Name == layoutName).SlideLayout.CommonSlideData.Clone();
+        slidePart.AddPart<SlideLayoutPart>(slPart);
+        slidePart.Slide.CommonSlideData = (CommonSlideData)slPart.SlideLayout.CommonSlideData.Clone();
 
-        using (Stream stream = slPart.GetStream())
-        {
-            sPart.SlideLayoutPart.FeedData(stream);
-        }
+        // TODO:  Check image creation on doc
+
+        AddImage(slidePart, imagePath, ImageTypes.Png);
+
+        // TODO:  Check if we can get data without sourcing from master slide
+        // using (Stream stream = slPart.GetStream())
+        // {
+        //     slidePart.SlideLayoutPart.FeedData(stream);
+        // }
 
         //UPDATED: Copy the images from the slide master layout to the new slide
-        foreach (ImagePart iPart in slPart.ImageParts)
-        {
-            ImagePart newImagePart = sPart.AddImagePart(iPart.ContentType, slPart.GetIdOfPart(iPart));
-            newImagePart.FeedData(iPart.GetStream());
-        }
+        // foreach (ImagePart iPart in slPart.AddImagePart())
+        // {
+        //     ImagePart newImagePart = slidePart.AddImagePart(iPart.ContentType, slPart.GetIdOfPart(iPart));
+        //     newImagePart.FeedData(iPart.GetStream());
+        // }
 
-        SlideId newSlideId = pPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
+        presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
+        // SlideId newSlideId = presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
 
         // TODO: Check default value in presentation ID list,  or try append to static value maybe?
         // newSlideId = slideId;
@@ -441,18 +471,18 @@ public class WellWellWell
     }
 
     // TODO: check if we can bypass slide layout generation through pML Ids
-    private static void zzz(PresentationPart pPart, List<string> imagePaths)
+    private static void BuildSlides(PresentationPart pPart, List<string> imagePaths)
     {
         // TODO:  Check need for slideIdList with only slide master
-            // pPart.Presentation.SlideIdList = new SlideIdList();
+        // pPart.Presentation.SlideIdList = new SlideIdList();
 
-            // TODO: complete declaration of image fills to slides,  verify slide layout parts
-        // imagePaths.ForEach();
-            InsertSlide(pPart, "Layout1", 256);
-            InsertSlide(pPart, "Layout2", 256);
-            InsertSlide(pPart, "Layout1", 256);
+        // TODO: complete declaration of image fills to slides,  verify slide layout parts
+        for (int i = 0; i < imagePaths.Count; i++)
+        {
+            InsertSlide(pPart, imagePaths[i]);
+        }
 
-            // TODO:  Check if we still need
-            pPart.Presentation.Save();
+        // TODO:  Check if we still need
+        pPart.Presentation.Save();
     }
 }

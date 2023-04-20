@@ -23,9 +23,9 @@ static class Program
             @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\bad.png"
         };
 
-        DeckGenerator.CreatePresentation(filePath, imagePaths);
+        WellWellWell.CreatePresentation(filePath, imagePaths);
         // PresentationGenerator.CreatePresentation(new List<string> { "C:\\Users\\dubeb003\\projects\\grad\\cs-lvlup\\battle-dex\\images\\MicrosoftTeams-image(1).png" });
 
-        Application.Run(new BattleDex());
+        // Application.Run(new BattleDex());
     }    
 }
