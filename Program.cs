@@ -15,18 +15,6 @@ static class Program
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-
-        string resultFilePath = @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\result.pptx";
-        string templateFilePath = @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\template\template.pptx";
-        List<string> imagePaths = new List<string>
-        {
-            @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\unfinished.png",
-            @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\747.png",
-            @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\java.png",
-            @"C:\Users\dubeb003\projects\grad\cs-lvlup\battle-dex\images\bad.png"
-        };
-        DeckGenerator.CreatePresentation(templateFilePath, resultFilePath, "Temporary topic", imagePaths);
-
-        // Application.Run(new BattleDex());
-    }
+        Application.Run(new frmBattle());
+    }    
 }

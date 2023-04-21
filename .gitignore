@@ -7,4 +7,5 @@ bin/
 .vs/
 .vscode/
 
+# User files
 *.user

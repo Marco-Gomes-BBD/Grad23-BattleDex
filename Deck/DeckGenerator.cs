@@ -3,13 +3,13 @@ using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
 using BlipFill = DocumentFormat.OpenXml.Presentation.BlipFill;
-using DShape = DocumentFormat.OpenXml.Drawing.Shape;
 using NonVisualDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualDrawingProperties;
 using NonVisualPictureDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureDrawingProperties;
 using NonVisualPictureProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureProperties;
-using Path = System.IO.Path;
 using Picture = DocumentFormat.OpenXml.Presentation.Picture;
 using ShapeProperties = DocumentFormat.OpenXml.Presentation.ShapeProperties;
+using DShape = DocumentFormat.OpenXml.Drawing.Shape;
+using Path = System.IO.Path;
 
 namespace Grad23_BattleDex.services;
 
@@ -23,7 +23,10 @@ public class DeckGenerator
         using (PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true))
         {
             AddTopic(presentation.PresentationPart, topic);
-            BuildSlides(presentation.PresentationPart, imagePaths);
+            for (int i = 0; i < imagePaths.Count; i++)
+            {
+                InsertSlide(presentation.PresentationPart, imagePaths[i]);
+            }
         }
     }
 
@@ -37,7 +40,7 @@ public class DeckGenerator
         }
     }
 
-    public static void AddImage(SlidePart slidePart, string image, ImagePartType imagePartType)
+    private static void AddImage(SlidePart slidePart, string image, ImagePartType imagePartType)
     {
         ImagePart imagePart = slidePart
             .AddImagePart(imagePartType);
@@ -123,9 +126,6 @@ public class DeckGenerator
                 imagePartType = ImagePartType.Png;
                 break;
             default:
-                // TODO:  Convert to exception and handle/display
-                Console.WriteLine($"Invalid image format: Skipping {imagePath}");
-                Console.WriteLine($"Image type not recognised: \"{imagePath}\" has an invalid file extension");
                 return;
         }
 
@@ -141,13 +141,5 @@ public class DeckGenerator
 
         AddImage(slidePart, imagePath, imagePartType.Value);
         presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
-    }
-
-    private static void BuildSlides(PresentationPart pPart, List<string> imagePaths)
-    {
-        for (int i = 0; i < imagePaths.Count; i++)
-        {
-            InsertSlide(pPart, imagePaths[i]);
-        }
     }
 }
