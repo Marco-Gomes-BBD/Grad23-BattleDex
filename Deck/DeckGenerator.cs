@@ -16,26 +16,31 @@ namespace Grad23_BattleDex.services;
 public class DeckGenerator
 {
     public static void CreatePresentation(string templateFile, string resultFilePath,
-        string topic, List<string> imagePaths)
+        string topic, List<string> imagePaths, int duration = 30)
     {
         File.Copy(templateFile, resultFilePath, true);
 
         using (PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true))
         {
-            AddTopic(presentation.PresentationPart, topic);
             for (int i = 0; i < imagePaths.Count; i++)
             {
                 InsertSlide(presentation.PresentationPart, imagePaths[i]);
             }
+
+            SetDurationAndTopic(presentation.PresentationPart, duration, topic);
         }
     }
 
-    private static void AddTopic(PresentationPart presentationPart, string topic)
+    private static void SetDurationAndTopic(PresentationPart presentationPart, int duration, string topic)
     {
         Slide slide = presentationPart.SlideParts.First().Slide;
+
+        Regex regex = new Regex("advTm=\"25497\"");
+        slide.InnerXml = regex.Replace(slide.InnerXml, $"advTm=\"{duration * 1000}\"");
+
         if (slide.InnerXml.Contains("PlaceHolder"))
         {
-            Regex regex = new Regex("PlaceHolder");
+            regex = new Regex("PlaceHolder");
             slide.InnerXml = regex.Replace(slide.InnerXml, topic);
         }
     }
@@ -132,14 +137,24 @@ public class DeckGenerator
         Slide slide = new Slide(new CommonSlideData(new ShapeTree()));
         SlidePart slidePart = presentationPart.AddNewPart<SlidePart>();
 
+        // TODO:  Check transitions in slide
         slide.Save(slidePart);
         SlideMasterPart smPart = presentationPart.SlideMasterParts.First();
-        SlideLayoutPart? slPart = smPart.SlideLayoutParts.First();
+        SlideLayoutPart slPart = smPart.SlideLayoutParts.First();
 
-        slidePart.AddPart<SlideLayoutPart>(slPart);
+        slidePart.AddPart(slPart);
         slidePart.Slide.CommonSlideData = (CommonSlideData)slPart.SlideLayout.CommonSlideData.Clone();
 
         AddImage(slidePart, imagePath, imagePartType.Value);
-        presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
+        SlideIdList slideIdList = presentationPart.Presentation.SlideIdList;
+        uint maxSlideId = 1;
+
+        foreach (SlideId slideId in slideIdList.ChildElements)
+        {
+            if (slideId.Id > maxSlideId) maxSlideId = slideId.Id;
+        }
+
+        SlideId newSlideId = new SlideId { Id = ++maxSlideId, RelationshipId = presentationPart.GetIdOfPart(slidePart) };
+        slideIdList.Append(newSlideId);
     }
 }
