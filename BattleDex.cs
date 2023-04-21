@@ -24,7 +24,7 @@ namespace Grad23_BattleDex
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            DeckGenerator.CreatePresentation("Resources\\template.pptx", "placeholder", topic, slides);
+            DeckGenerator.CreatePresentation("Resources\\template.pptx", "presentation.pptx", topic, slides);
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
