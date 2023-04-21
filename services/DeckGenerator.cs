@@ -1,22 +1,15 @@
 ﻿using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
 using BlipFill = DocumentFormat.OpenXml.Presentation.BlipFill;
-using ColorMap = DocumentFormat.OpenXml.Presentation.ColorMap;
+using DShape = DocumentFormat.OpenXml.Drawing.Shape;
 using NonVisualDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualDrawingProperties;
-using NonVisualGroupShapeDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualGroupShapeDrawingProperties;
-using NonVisualGroupShapeProperties = DocumentFormat.OpenXml.Presentation.NonVisualGroupShapeProperties;
 using NonVisualPictureDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureDrawingProperties;
 using NonVisualPictureProperties = DocumentFormat.OpenXml.Presentation.NonVisualPictureProperties;
-using NonVisualShapeDrawingProperties = DocumentFormat.OpenXml.Presentation.NonVisualShapeDrawingProperties;
-using NonVisualShapeProperties = DocumentFormat.OpenXml.Presentation.NonVisualShapeProperties;
+using Path = System.IO.Path;
 using Picture = DocumentFormat.OpenXml.Presentation.Picture;
-using Shape = DocumentFormat.OpenXml.Presentation.Shape;
 using ShapeProperties = DocumentFormat.OpenXml.Presentation.ShapeProperties;
-using TextBody = DocumentFormat.OpenXml.Presentation.TextBody;
-using DShape = DocumentFormat.OpenXml.Drawing.Shape;
 
 namespace Grad23_BattleDex.services;
 
@@ -29,48 +22,32 @@ public class DeckGenerator
 
         using (PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true))
         {
-            BuildSlides(presentation.PresentationPart, imagePaths);
             AddTopic(presentation.PresentationPart, topic);
+            BuildSlides(presentation.PresentationPart, imagePaths);
         }
     }
 
     private static void AddTopic(PresentationPart presentationPart, string topic)
     {
-        DShape textbox = (DShape) presentationPart.SlideParts.First().Slide.CommonSlideData.ShapeTree.LastChild;
-        if (textbox.InnerText.Contains("PlaceHolder"))
+        Slide slide = presentationPart.SlideParts.First().Slide;
+        if (slide.InnerXml.Contains("PlaceHolder"))
         {
             Regex regex = new Regex("PlaceHolder");
-            textbox.InnerXml = regex.Replace(textbox.InnerXml, topic); //.TextBody.BodyProperties. = topic;
+            slide.InnerXml = regex.Replace(slide.InnerXml, topic);
         }
     }
 
-    public static void AddImage(SlidePart slidePart, string image, ImageTypes type)
+    public static void AddImage(SlidePart slidePart, string image, ImagePartType imagePartType)
     {
-        ImagePartType imagePartType;
-        switch (type)
-        {
-            case ImageTypes.Bmp:
-                imagePartType = ImagePartType.Bmp;
-                break;
-            case ImageTypes.Jpg:
-                imagePartType = ImagePartType.Jpeg;
-                break;
-            case ImageTypes.Png:
-                imagePartType = ImagePartType.Png;
-                break;
-            default:
-                throw new ArgumentException("Image type not recognised");
-        }
-
-        var part = slidePart
+        ImagePart imagePart = slidePart
             .AddImagePart(imagePartType);
 
         using (var stream = File.OpenRead(image))
         {
-            part.FeedData(stream);
+            imagePart.FeedData(stream);
         }
 
-        var tree = slidePart
+        ShapeTree tree = slidePart
             .Slide
             .Descendants<ShapeTree>()
             .First();
@@ -95,7 +72,7 @@ public class DeckGenerator
         var blipFill = new BlipFill();
         var blip1 = new Blip
         {
-            Embed = slidePart.GetIdOfPart(part)
+            Embed = slidePart.GetIdOfPart(imagePart)
         };
         var blipExtensionList1 = new BlipExtensionList();
         var blipExtension1 = new BlipExtension
@@ -113,13 +90,12 @@ public class DeckGenerator
         picture.ShapeProperties = new ShapeProperties();
         picture.ShapeProperties.Transform2D = new Transform2D(new Offset
         {
-            // TODO:  Check padding size on actual image
-            X = 5,
-            Y = 5
+            X = 0,
+            Y = 0
         }, new Extents
         {
-            Cx = 9143990,
-            Cy = 6857990
+            Cx= 12192000,
+            Cy= 6858000
         });
         picture.ShapeProperties.Append(new PresetGeometry
         {
@@ -131,18 +107,39 @@ public class DeckGenerator
 
     private static void InsertSlide(PresentationPart presentationPart, string imagePath)
     {
+        ImagePartType? imagePartType;
+        string type = Path.GetExtension(imagePath);
+
+        switch (type.Trim().ToUpper())
+        {
+            case ".BMP":
+                imagePartType = ImagePartType.Bmp;
+                break;
+            case ".JPG":
+            case ".JPEG":
+                imagePartType = ImagePartType.Jpeg;
+                break;
+            case ".PNG":
+                imagePartType = ImagePartType.Png;
+                break;
+            default:
+                // TODO:  Convert to exception and handle/display
+                Console.WriteLine($"Invalid image format: Skipping {imagePath}");
+                Console.WriteLine($"Image type not recognised: \"{imagePath}\" has an invalid file extension");
+                return;
+        }
+
         Slide slide = new Slide(new CommonSlideData(new ShapeTree()));
         SlidePart slidePart = presentationPart.AddNewPart<SlidePart>();
 
         slide.Save(slidePart);
         SlideMasterPart smPart = presentationPart.SlideMasterParts.First();
-        SlideLayoutPart slPart = smPart.SlideLayoutParts.First();
+        SlideLayoutPart? slPart = smPart.SlideLayoutParts.First();
 
         slidePart.AddPart<SlideLayoutPart>(slPart);
         slidePart.Slide.CommonSlideData = (CommonSlideData)slPart.SlideLayout.CommonSlideData.Clone();
 
-        AddImage(slidePart, imagePath, ImageTypes.Png);
-
+        AddImage(slidePart, imagePath, imagePartType.Value);
         presentationPart.Presentation.SlideIdList.AppendChild<SlideId>(new SlideId());
     }
 
