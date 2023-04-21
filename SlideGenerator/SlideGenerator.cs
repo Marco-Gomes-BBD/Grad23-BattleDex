@@ -9,7 +9,6 @@ namespace Grad23_BattleDex.SG
 
         public static List<string> Generate(List<string> tags, int presentationSize)
         {
-            DatabaseFunctions databaseFunctions = new();
             List<string> dbTags = DatabaseFunctions.AllExistingTags()
                 .Where(dbTag => Contains(dbTag, tags)).ToList();
 
