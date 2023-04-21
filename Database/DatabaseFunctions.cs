@@ -13,20 +13,22 @@ namespace Grad23_BattleDex.Database
 
         private class TaggedImage
         {
-            public string Path { get; set; }
-            public List<string> Tags { get; set; }
+            public string path { get; set; }
+            public List<string> tags { get; set; }
             public TaggedImage(string path, List<string> tags)
             {
-                Path = path;
-                Tags = tags;
+                this.path = path;
+                this.tags = tags;
             }
         }
 
-        public static void InsertImages(string imagesJson)
+        public static void InsertImages(string path)
         {
             SqlConnection conn = ConnectToDB();
             conn.Open();
-            List<TaggedImage>? imageLines = JsonSerializer.Deserialize<List<TaggedImage>>(imagesJson);
+
+            FileStream file = new(path, FileMode.Open, FileAccess.Read);
+            List<TaggedImage>? imageLines = JsonSerializer.Deserialize<List<TaggedImage>>(file);
             string imageInsert = "INSERT INTO dbo.images (file_path) SELECT @filepath " +
                                  "WHERE NOT EXISTS (SELECT * FROM dbo.images WHERE file_path = @filepath); " +
                                  "SELECT id FROM dbo.images WHERE file_path = @filepath";
@@ -43,11 +45,11 @@ namespace Grad23_BattleDex.Database
                     int imageID;
                     using (SqlCommand command = new SqlCommand(imageInsert, conn))
                     {
-                        command.Parameters.AddWithValue("@filepath", item.Path.ToString());
+                        command.Parameters.AddWithValue("@filepath", item.path.ToString());
                         imageID = Convert.ToInt32(command.ExecuteScalar());
                     }
                     List<int> tagIDs = new List<int>();
-                    foreach (var tag in item.Tags)
+                    foreach (var tag in item.tags)
                     {
                         int tagID;
                         using (SqlCommand command = new SqlCommand(tagInsert, conn))
