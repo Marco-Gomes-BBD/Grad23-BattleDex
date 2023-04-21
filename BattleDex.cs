@@ -1,4 +1,4 @@
-using Grad23_BattleDex.Database;
+﻿using Grad23_BattleDex.Database;
 using Grad23_BattleDex.services;
 using Grad23_BattleDex.SG;
 using Grad23_BattleDex.Topics;
@@ -15,14 +15,18 @@ namespace Grad23_BattleDex
         List<string> slides;
         int currentSlide = 0;
 
+        private const string battlePath = "Resources\\battledex\\";
+        private const string rulesPath = "Resources\\rules.json";
+        private const string tagsRelativeBattlePath = "tags.json";
+
         public frmBattle()
         {
             InitializeComponent();
 
-            topicGenerator = new("Resources\\rules.json");
+            topicGenerator = new(rulesPath);
             topic = string.Empty;
 
-            DatabaseFunctions.InsertImages("Resources\\battledex\\tags.json");
+            DatabaseFunctions.InsertImages(battlePath + tagsRelativeBattlePath);
 
             slideCount = (int)nudSlides.Value;
             slides = new();
@@ -30,7 +34,8 @@ namespace Grad23_BattleDex
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            DeckGenerator.CreatePresentation("Resources\\template.pptx", "presentation.pptx", topic, slides);
+            List<string> exportSlides = slides.Select(path => battlePath + path).ToList();
+            DeckGenerator.CreatePresentation("Resources\\template.pptx", "presentation.pptx", topic, exportSlides);
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -82,7 +87,7 @@ namespace Grad23_BattleDex
 
             if (slide > -1 && slide < slides.Count)
             {
-                pbBattle.Image = Image.FromFile("Resources\\battledex\\" + slides[slide]);
+                pbBattle.Image = Image.FromFile(battlePath + slides[slide]);
             }
             currentSlide = slide;
         }
