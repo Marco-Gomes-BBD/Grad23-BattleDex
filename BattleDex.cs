@@ -1,6 +1,6 @@
-﻿using Grad23_BattleDex.Database;
-using Grad23_BattleDex.services;
-using Grad23_BattleDex.SG;
+﻿using Grad23_BattleDex.Data;
+using Grad23_BattleDex.Deck;
+using Grad23_BattleDex.SliderGenerator;
 using Grad23_BattleDex.Topics;
 using TextBox = System.Windows.Forms.TextBox;
 
@@ -15,6 +15,8 @@ namespace Grad23_BattleDex
         List<string> slides;
         int currentSlide = 0;
 
+        ImageManager images;
+
         private const string battlePath = "Resources\\battledex\\";
         private const string rulesPath = "Resources\\rules.json";
         private const string tagsRelativeBattlePath = "tags.json";
@@ -26,7 +28,7 @@ namespace Grad23_BattleDex
             topicGenerator = new(rulesPath);
             topic = string.Empty;
 
-            DatabaseFunctions.InsertImages(battlePath + tagsRelativeBattlePath);
+            images = new(battlePath + tagsRelativeBattlePath);
 
             slideCount = (int)nudSlides.Value;
             slides = new();
@@ -41,7 +43,7 @@ namespace Grad23_BattleDex
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             string[] tags = TopicParser.Parse(topic);
-            slides = SlideGenerator.Generate(tags.ToList(), slideCount);
+            slides = SlideGenerator.Generate(images, tags.ToList(), slideCount);
 
             ChangeSlide(0);
         }

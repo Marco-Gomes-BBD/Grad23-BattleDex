@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Grad23_BattleDex.services;
+using Grad23_BattleDex.Deck;
 
 namespace Grad23_BattleDex;
 

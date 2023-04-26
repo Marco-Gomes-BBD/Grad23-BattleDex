@@ -1,41 +1,35 @@
-using Grad23_BattleDex.Database;
 using System.Data;
+using Grad23_BattleDex.Data;
 
-namespace Grad23_BattleDex.SG
+namespace Grad23_BattleDex.SliderGenerator
 {
-    public class SlideGenerator
+    internal class SlideGenerator
     {
         private static readonly Random random = new();
 
-        public static List<string> Generate(List<string> tags, int presentationSize)
+        public static List<string> Generate(ImageManager images, List<string> tags, int presentationSize)
         {
-            DatabaseFunctions databaseFunctions = new();
-            List<string> dbTags = DatabaseFunctions.AllExistingTags()
-                .Where(dbTag => Contains(dbTag, tags)).ToList();
+            string[] registeredTags = images.AllTags();
+            string[] queryTags = registeredTags.Where(tags.Contains).ToArray();
 
-            List<string> locations = DatabaseFunctions.GetImagesForTag(dbTags)
-                .OrderBy(a => random.Next())
+            List<string> slides = images.GetImagesByTags(queryTags)
+                .OrderBy(image => random.Next())
                 .Take(presentationSize)
                 .ToList();
 
-            int remaining = presentationSize - locations.Count;
+            int remaining = presentationSize - slides.Count;
 
             if (remaining > 0)
             {
-                locations.AddRange(
-                    DatabaseFunctions.GetAllImages()
-                    .Where(location => !locations.Contains(location))
+                slides.AddRange(
+                    images.GetNotInTags(queryTags)
+                    .Where(location => !slides.Contains(location))
                     .OrderBy(a => random.Next())
                     .Take(remaining)
                     .ToList());
             }
 
-            return locations;
-        }
-
-        private static bool Contains(string dbTag, List<string> tags)
-        {
-            return tags.Select(dbTag.Contains).Any();
+            return slides;
         }
     }
 }
