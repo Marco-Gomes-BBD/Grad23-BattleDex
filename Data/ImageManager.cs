@@ -7,7 +7,7 @@ namespace Grad23_BattleDex.Data
     internal class ImageManager
     {
         List<TaggedImage> images;
-        public List<string> tags;
+        public HashSet<string> tags;
 
         public ImageManager(string path)
         {
@@ -17,6 +17,14 @@ namespace Grad23_BattleDex.Data
             List<TaggedImage>? images = JsonSerializer.Deserialize<List<TaggedImage>>(file);
 
             this.images = images ?? new List<TaggedImage>();
+            foreach (TaggedImage image in this.images)
+            {
+                foreach (string tag in image.tags)
+                {
+                    string baseTag = Language.Stemmer.Stem(tag);
+                    tags.Add(baseTag);
+                }
+            }
         }
 
         internal string[] AllTags()
