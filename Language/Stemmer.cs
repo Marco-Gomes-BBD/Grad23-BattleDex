@@ -4,7 +4,7 @@ namespace Grad23_BattleDex.Language
 {
     internal class Stemmer
     {
-        static readonly EnglishPorter2Stemmer stemmer = new();
+        static readonly EnglishPorter2Stemmer stemmer = new EnglishPorter2Stemmer();
 
         public static string Stem(string text)
         {

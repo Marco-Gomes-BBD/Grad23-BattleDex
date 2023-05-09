@@ -24,13 +24,13 @@ namespace Grad23_BattleDex
         {
             InitializeComponent();
 
-            topicGenerator = new(rulesPath);
+            topicGenerator = new BattleDexTopic(rulesPath);
             topic = string.Empty;
 
-            images = new(battlePath + tagsRelativeBattlePath);
+            images = new ImageManager(battlePath + tagsRelativeBattlePath);
 
             slideCount = (int)nudSlides.Value;
-            slides = new();
+            slides = new List<string>();
         }
 
         private void btnExport_Click(object sender, EventArgs e)

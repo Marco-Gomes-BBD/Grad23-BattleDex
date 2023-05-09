@@ -13,11 +13,11 @@ namespace Grad23_BattleDex.Topics
   public class RulesLoader
   {
     private string axiom;
-    private string filePath;
+    private readonly string filePath;
 
     public RulesLoader(string filePath)
     {
-      this.axiom = "S";
+      axiom = "S";
       this.filePath = filePath;
     }
 
@@ -33,7 +33,7 @@ namespace Grad23_BattleDex.Topics
       foreach (RuleSet set in jsonData!)
       {
         if(set.start){
-          this.axiom = set.rule.ToString();
+          axiom = set.rule.ToString();
         }
         rules[set.rule] = set.data!;
       }

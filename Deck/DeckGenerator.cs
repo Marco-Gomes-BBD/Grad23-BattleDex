@@ -5,7 +5,7 @@ namespace Grad23_BattleDex.Deck;
 
 internal class DeckGenerator
 {
-    private static readonly Random random = new();
+    private static readonly Random random = new Random();
 
     public static List<string> Generate(ImageManager images, List<string> tags, int presentationSize)
     {

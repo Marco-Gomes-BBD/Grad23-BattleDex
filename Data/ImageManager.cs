@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Grad23_BattleDex.Data
 {
@@ -11,9 +12,9 @@ namespace Grad23_BattleDex.Data
 
         public ImageManager(string path)
         {
-            tags = new();
+            tags = new HashSet<string>();
 
-            FileStream file = new(path, FileMode.Open, FileAccess.Read);
+            FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
             List<TaggedImage>? images = JsonSerializer.Deserialize<List<TaggedImage>>(file);
 
             this.images = images ?? new List<TaggedImage>();

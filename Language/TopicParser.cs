@@ -7,7 +7,7 @@ namespace Grad23_BattleDex.Topics
     {
         public static string[] Parse(string topic)
         {
-            Regex wordMatcher = new(@"\w+");
+            Regex wordMatcher = new Regex(@"\w+");
             MatchCollection matches = wordMatcher.Matches(topic);
 
             IEnumerable<string> words = matches.Select(match => match.Value);
