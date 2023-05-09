@@ -1,6 +1,5 @@
 ﻿using Grad23_BattleDex.Data;
 using Grad23_BattleDex.Deck;
-using Grad23_BattleDex.SliderGenerator;
 using Grad23_BattleDex.Topics;
 using TextBox = System.Windows.Forms.TextBox;
 
@@ -37,13 +36,13 @@ namespace Grad23_BattleDex
         private void btnExport_Click(object sender, EventArgs e)
         {
             List<string> exportSlides = slides.Select(path => battlePath + path).ToList();
-            DeckGenerator.CreatePresentation("Resources\\template.pptx", "presentation.pptx", topic, exportSlides);
+            DeckExporter.CreatePresentation("Resources\\template.pptx", "presentation.pptx", topic, exportSlides);
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             string[] tags = TopicParser.Parse(topic);
-            slides = SlideGenerator.Generate(images, tags.ToList(), slideCount);
+            slides = DeckGenerator.Generate(images, tags.ToList(), slideCount);
 
             ChangeSlide(0);
         }
