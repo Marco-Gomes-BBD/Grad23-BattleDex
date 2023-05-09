@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
@@ -19,14 +19,16 @@ public class DeckExporter
     {
         File.Copy(templateFile, resultFilePath, true);
 
-        using (PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true))
+        using PresentationDocument presentation = PresentationDocument.Open(resultFilePath, true);
+        PresentationPart? presentationPart = presentation.PresentationPart;
+        if (presentationPart != null)
         {
             for (int i = 0; i < imagePaths.Count; i++)
             {
-                InsertSlide(presentation.PresentationPart, imagePaths[i]);
+                InsertSlide(presentationPart, imagePaths[i]);
             }
 
-            SetDurationAndTopic(presentation.PresentationPart, duration, topic);
+            SetDurationAndTopic(presentationPart, duration, topic);
         }
     }
 
@@ -59,7 +61,7 @@ public class DeckExporter
             .Descendants<ShapeTree>()
             .First();
 
-        Picture picture = new();
+        Picture picture = new Picture();
         picture.NonVisualPictureProperties = new NonVisualPictureProperties();
         picture.NonVisualPictureProperties.Append(new NonVisualDrawingProperties
         {
@@ -100,8 +102,8 @@ public class DeckExporter
             Y = 0
         }, new Extents
         {
-            Cx= 12192000,
-            Cy= 6858000
+            Cx = 12192000,
+            Cy = 6858000
         });
         picture.ShapeProperties.Append(new PresetGeometry
         {
@@ -141,18 +143,29 @@ public class DeckExporter
         SlideLayoutPart slPart = smPart.SlideLayoutParts.First();
 
         slidePart.AddPart(slPart);
-        slidePart.Slide.CommonSlideData = (CommonSlideData)slPart.SlideLayout.CommonSlideData.Clone();
-
-        AddImage(slidePart, imagePath, imagePartType.Value);
-        SlideIdList slideIdList = presentationPart.Presentation.SlideIdList;
-        uint maxSlideId = 1;
-
-        foreach (SlideId slideId in slideIdList.ChildElements)
+        CommonSlideData? commonSlideData = slPart.SlideLayout.CommonSlideData;
+        if (commonSlideData != null)
         {
-            if (slideId.Id > maxSlideId) maxSlideId = slideId.Id;
+            slidePart.Slide.CommonSlideData = (CommonSlideData)commonSlideData.Clone();
         }
 
-        SlideId newSlideId = new SlideId { Id = ++maxSlideId, RelationshipId = presentationPart.GetIdOfPart(slidePart) };
-        slideIdList.Append(newSlideId);
+        AddImage(slidePart, imagePath, imagePartType.Value);
+        SlideIdList? slideIdList = presentationPart.Presentation.SlideIdList;
+        uint maxSlideId = 1;
+
+        if (slideIdList != null)
+        {
+            foreach (SlideId slideId in slideIdList.ChildElements.Cast<SlideId>())
+            {
+                if (slideId.Id?.Value > maxSlideId) maxSlideId = slideId.Id;
+            }
+
+            SlideId newSlideId = new SlideId()
+            {
+                Id = ++maxSlideId,
+                RelationshipId = presentationPart.GetIdOfPart(slidePart)
+            };
+            slideIdList.Append(newSlideId);
+        }
     }
 }
